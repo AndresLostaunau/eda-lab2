@@ -16,7 +16,7 @@ class RangeTree1D : public SpatialBase<Point> {
       RangeTree1D<Point> *left;
       RangeTree1D<Point> *right;
     public:
-      RangeTree1D<Point>(){};
+      RangeTree1D<Point>():height(0),left(nullptr),right(nullptr){};
       RangeTree1D<Point>(Point c):content(c),height(1),left(nullptr),right(nullptr){};
 
       void setContent(Point _content){
@@ -63,6 +63,9 @@ class RangeTree1D : public SpatialBase<Point> {
         this->setRight(this->getLeft()->getRight());
         this->getLeft()->setRight(this->getLeft()->getLeft());
         this->getLeft()->setLeft(aux_ptr);
+
+        this->setHeight(this->getHeight()-1);
+        this->getLeft()->setHeight(this->getLeft()->getHeight()-1);
       }
 
       void rightRotation(){
@@ -77,20 +80,23 @@ class RangeTree1D : public SpatialBase<Point> {
         this->setLeft(this->getRight()->getLeft());
         this->getRight()->setLeft(this->getRight()->getRight());
         this->getRight()->setRight(aux_ptr);
+
+        this->setHeight(this->getHeight()-1);
+        this->getRight()->setHeight(this->getRight()->getHeight()-1);
       }
 
       void LRRotation(){
         this->getLeft()->leftRotation();
         this->rightRotation();
-        setHeight(getHeight()-1);
-        this->getRight()->setHeight(this->getRight()->getHeight()-1);
+        this->getLeft()->setHeight(this->getLeft()->getHeight()+1);
+        this->getRight()->setHeight(this->getRight()->getHeight()+1);
       }
 
       void RLRotation(){
         this->getRight()->rightRotation();
         this->leftRotation();
-        setHeight(getHeight()-1);
-        this->getLeft()->setHeight(this->getLeft()->getHeight()-1);
+        setHeight(getHeight());
+        this->getLeft()->setHeight(this->getLeft()->getHeight()+2);
       }
 
       void balance(){
@@ -101,36 +107,38 @@ class RangeTree1D : public SpatialBase<Point> {
         if(this->getRight() != nullptr){
           rh = this->getRight()->getHeight();
         }
-        if((lh - rh) > 1){
-          if(this->getLeft()->getRight()->getHeight() > this->getLeft()->getLeft()->getHeight()){
-            this->LRRotation();
-          }else{
-            this->leftRotation();
+        if((lh - rh) < -1){
+            if(this->getRight()->getHeight() > 1 && this->getRight()->getRight()->getHeight() < this->getRight()->getLeft()->getHeight()){
+                this->RLRotation();
+            }else{
+                this->leftRotation();
           }
-        }else if((lh - rh) < -1){
-          if(this->getRight()->getRight()->getHeight() < this->getRight()->getLeft()->getHeight()){
-            this->RLRotation();
-          }else{
+        }else if((lh - rh) > 1){
+            if(this->getLeft()->getHeight() > 1 && this->getLeft()->getRight()->getHeight() > this->getLeft()->getLeft()->getHeight()){
+                this->LRRotation();
+            }else{
             this->rightRotation();
           }
         }
       }
 
       void insert(const Point& _content) override {
-        int l=1, r=1;
+          if(this->height == 0){
+              this->setContent(_content);
+              this->setHeight(1);
+              return;
+          }
         Point aux;
         if(this->content < _content){
-          if(this->right == nullptr){
-            aux = this->getContent();
-            this->setContent(_content);
-            this->setLeft(new RangeTree1D<Point>(_content));
-            this->setRight(new RangeTree1D<Point>(aux));
+          if(this->getRight() == nullptr){
+              this->setLeft(new RangeTree1D<Point>(this->getContent()));
+            this->setRight(new RangeTree1D<Point>(_content));
             this->setHeight(2);
           }else{
             this->getRight()->insert(_content);
           }
         }else{
-            if(this->left == nullptr){
+            if(this->getLeft() == nullptr){
             aux = this->getContent();
             this->setContent(_content);
             this->setLeft(new RangeTree1D<Point>(_content));
@@ -140,7 +148,7 @@ class RangeTree1D : public SpatialBase<Point> {
             this->getLeft()->insert(_content);
           }
         }
-        if(l > r){
+        if(this->getLeft()->getHeight() > this->getRight()->getHeight()){
           this->setHeight(this->getLeft()->getHeight()+1);
         }else{
           this->setHeight(this->getRight()->getHeight()+1);
@@ -156,6 +164,7 @@ class RangeTree1D : public SpatialBase<Point> {
       if((min < it->getContent() or it->getContent()==min) && (it->getContent() < max or it->getContent()==max) ){
         ans_vec->push_back(it->getContent());
       }
+      return;
     }
 
     if(it->getContent() < min){
