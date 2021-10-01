@@ -117,39 +117,39 @@ namespace spatial {
         }
       }
 
-      int insert(Point _content){
-        int l=1, r=1, aux;
-        if(this->content > _content){
-          if(this->left == nullptr){
-            aux = this->getContent();
-            this->setContent(_content);
-            this->setLeft(new RT1DNode(_content));
-            this->setRight(new RT1DNode(aux));
-            this->setHeight(2);
-            return 2;
-          }else{
-            l = this->getLeft()->insert(_content);
-          }
-        }else{
-          if(this->right == nullptr){
-            aux = this->getContent();
-            this->setContent(_content);
-            this->setLeft(new RT1DNode(_content));
-            this->setRight(new RT1DNode(aux));
-            this->setHeight(2);
-            return 2;
-          }else{
-            r = this->getRight()->insert(_content);
-          }
-        }
-        if(l > r){
-          this->setHeight(l+1);
-        }else{
-          this->setHeight(r+1);
-        }
-        balance()
-        return this->height;
-      }
+      // int insert(Point _content){
+      //   int l=1, r=1, aux;
+      //   if(this->content > _content){
+      //     if(this->left == nullptr){
+      //       aux = this->getContent();
+      //       this->setContent(_content);
+      //       this->setLeft(new RT1DNode(_content));
+      //       this->setRight(new RT1DNode(aux));
+      //       this->setHeight(2);
+      //       return 2;
+      //     }else{
+      //       l = this->getLeft()->insert(_content);
+      //     }
+      //   }else{
+      //     if(this->right == nullptr){
+      //       aux = this->getContent();
+      //       this->setContent(_content);
+      //       this->setLeft(new RT1DNode(_content));
+      //       this->setRight(new RT1DNode(aux));
+      //       this->setHeight(2);
+      //       return 2;
+      //     }else{
+      //       r = this->getRight()->insert(_content);
+      //     }
+      //   }
+      //   if(l > r){
+      //     this->setHeight(l+1);
+      //   }else{
+      //     this->setHeight(r+1);
+      //   }
+      //   balance();
+      //   return this->height;
+      // }
   };
 
 /**
@@ -158,14 +158,14 @@ namespace spatial {
 template <typename Point>
 class RangeTree1D : public SpatialBase<Point> {
  private:
-  RT1DNode *root;
+  RT1DNode<Point>* root;
  public:
   RangeTree1D(){
-    root = new RT1DNode();
+    //root = new RT1DNode();
   };
 
   void insert(const Point& new_point) override {
-    root->insert(new_point);
+    //root->insert(new_point);
   }
 
   // El punto de referencia no necesariamente es parte del dataset
